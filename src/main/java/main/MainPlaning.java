@@ -5,6 +5,8 @@
  */
 package main;
 
+import java.util.ArrayList;
+
 /**
  *
  * @author hawerforero
@@ -13,9 +15,24 @@ public class MainPlaning {
     
     public static void main(String[] args){
         
-            for(int i = 0; i < 5; i++){
-                Planing planing = new Planing(i);
-                planing.start();
-            }   
+        ArrayList<Proceso> procesos = new ArrayList<Proceso>();
+        //Agregar procesos
+        for(int i=0; i<5; i++){
+            Proceso proceso = new Proceso();
+            proceso.setId(i);
+            proceso.setNombre("Nombre"+i);
+        
+            procesos.add(proceso);
         }
+        
+       //Ejecutar proceso
+       for(int i=0; i<procesos.size(); i++){
+           System.out.println("Init process "+ procesos.get(i).getId());
+           Fcfs fcfs = new Fcfs(procesos.get(i));
+           fcfs.start();        
+       }
+          
+    }
 }
+
+

@@ -11,18 +11,20 @@ package main;
  */
 public class Proceso {
     
-    private int id;
+    private String id;
     private String nombre;
     private String tipo;
     private String estado;
-    private int tiempoCPU; 
+    private long tiempoLlegada; 
+    private long tiempoEspera; 
+    private long tiempoCPU; 
     private int prioridad;   
 
-    public int getId() {
+    public String getId() {
         return id;
     }
 
-    public void setId(int id) {
+    public void setId(String id) {
         this.id = id;
     }
 
@@ -42,11 +44,11 @@ public class Proceso {
         this.estado = estado;
     }
 
-    public int getTiempoCPU() {
+    public long getTiempoCPU() {
         return tiempoCPU;
     }
 
-    public void setTiempoCPU(int tiempoCPU) {
+    public void setTiempoCPU(long tiempoCPU) {
         this.tiempoCPU = tiempoCPU;
     }
 
@@ -66,9 +68,30 @@ public class Proceso {
         this.tipo = tipo;
     }
 
+    public long getTiempoLlegada() {
+        return tiempoLlegada;
+    }
+
+    public void setTiempoLlegada(long tiempoLlegada) {
+        this.tiempoLlegada = tiempoLlegada;
+    }
+
+    public long getTiempoEspera() {
+        return tiempoEspera;
+    }
+
+    public void setTiempoEspera(long tiempoEspera) {
+        this.tiempoEspera = tiempoEspera;
+    }
+
     @Override
     public String toString() {
-        return "Proceso{" + "id=" + id + ", nombre=" + nombre + ", tipo=" + tipo + ", estado=" + estado + ", tiempoCPU=" + tiempoCPU + ", prioridad=" + prioridad + '}';
+        return "Proceso{" + "id=" + id + ", nombre=" + nombre + ", tipo=" + tipo + ", estado=" + estado + ", tiempoLlegada=" + tiempoLlegada + ", tiempoEspera=" + tiempoEspera + ", tiempoCPU=" + tiempoCPU + ", prioridad=" + prioridad + '}';
+    }
+    
+
+    void setTiempo(int i) {
+        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
     }
     
     

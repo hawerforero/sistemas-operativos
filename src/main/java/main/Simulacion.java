@@ -6,18 +6,26 @@
 package main;
 
 import java.util.ArrayList;
+import java.util.logging.Level;
+import java.util.logging.Logger;
+import javax.swing.table.DefaultTableModel;
 
 /**
  *
  * @author hawerforero
  */
 public class Simulacion extends javax.swing.JFrame {
+    
+      ArrayList<Proceso> procesos = new ArrayList<Proceso>();
+      static ArrayList<Proceso> procesos_execute_fscs = new ArrayList<Proceso>();
+      long tiempo_inicial;
 
     /**
      * Creates new form Simulacion
      */
     public Simulacion() {
         initComponents();
+        tiempo_inicial = System.currentTimeMillis();
     }
 
     /**
@@ -40,6 +48,9 @@ public class Simulacion extends javax.swing.JFrame {
         jButton2 = new javax.swing.JButton();
         jScrollPane1 = new javax.swing.JScrollPane();
         jTable1 = new javax.swing.JTable();
+        jTabbedPane1 = new javax.swing.JTabbedPane();
+        jScrollPane2 = new javax.swing.JScrollPane();
+        jTable2 = new javax.swing.JTable();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
 
@@ -55,6 +66,11 @@ public class Simulacion extends javax.swing.JFrame {
         jButton1.addMouseListener(new java.awt.event.MouseAdapter() {
             public void mouseClicked(java.awt.event.MouseEvent evt) {
                 jButton1MouseClicked(evt);
+            }
+        });
+        jButton1.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jButton1ActionPerformed(evt);
             }
         });
 
@@ -90,16 +106,30 @@ public class Simulacion extends javax.swing.JFrame {
 
         jTable1.setModel(new javax.swing.table.DefaultTableModel(
             new Object [][] {
-                {"1", "Notepad", "5"},
-                {null, null, null},
-                {null, null, null},
-                {null, null, null}
+                {null, null, null, null},
+                {null, null, null, null},
+                {null, null, null, null}
             },
             new String [] {
-                "Id", "Nombre", "Tiempo CPU"
+                "Id", "Nombre", "Tiempo de Llegada", "Tiempo CPU"
             }
         ));
         jScrollPane1.setViewportView(jTable1);
+
+        jTable2.setModel(new javax.swing.table.DefaultTableModel(
+            new Object [][] {
+                {null, null, null, null},
+                {null, null, null, null},
+                {null, null, null, null},
+                {null, null, null, null}
+            },
+            new String [] {
+                "Title 1", "Title 2", "Title 3", "Title 4"
+            }
+        ));
+        jScrollPane2.setViewportView(jTable2);
+
+        jTabbedPane1.addTab("tab1", jScrollPane2);
 
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
         getContentPane().setLayout(layout);
@@ -126,7 +156,7 @@ public class Simulacion extends javax.swing.JFrame {
                                     .addComponent(jTextField2, javax.swing.GroupLayout.PREFERRED_SIZE, 103, javax.swing.GroupLayout.PREFERRED_SIZE)
                                     .addGroup(layout.createSequentialGroup()
                                         .addComponent(jTextField1, javax.swing.GroupLayout.PREFERRED_SIZE, 103, javax.swing.GroupLayout.PREFERRED_SIZE)
-                                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 255, Short.MAX_VALUE)
+                                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 271, Short.MAX_VALUE)
                                         .addComponent(jButton1)))))
                         .addGap(105, 105, 105)))
                 .addGap(41, 41, 41))
@@ -137,7 +167,10 @@ public class Simulacion extends javax.swing.JFrame {
                         .addComponent(jButton2))
                     .addGroup(layout.createSequentialGroup()
                         .addContainerGap()
-                        .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 328, javax.swing.GroupLayout.PREFERRED_SIZE)))
+                        .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 328, javax.swing.GroupLayout.PREFERRED_SIZE))
+                    .addGroup(layout.createSequentialGroup()
+                        .addContainerGap()
+                        .addComponent(jTabbedPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 712, javax.swing.GroupLayout.PREFERRED_SIZE)))
                 .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
         );
         layout.setVerticalGroup(
@@ -166,6 +199,8 @@ public class Simulacion extends javax.swing.JFrame {
                 .addComponent(jButton2)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 176, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addGap(39, 39, 39)
+                .addComponent(jTabbedPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 113, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addContainerGap(41, Short.MAX_VALUE))
         );
 
@@ -178,8 +213,18 @@ public class Simulacion extends javax.swing.JFrame {
 
     private void jButton1MouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_jButton1MouseClicked
         // TODO add your handling code here:
-        System.out.println("Clicked mouse");
-        jTextField2.setText(jTextField1.getText());
+          
+          procesos_execute_fscs = new ArrayList<Proceso>();
+          Fcfs fcfs = new Fcfs(procesos);
+          fcfs.start(); 
+          try {
+              fcfs.join();
+          } catch (InterruptedException ex) {
+              Logger.getLogger(Simulacion.class.getName()).log(Level.SEVERE, null, ex);
+          }
+         
+         this.mostrarDetalleFcfs();
+
     }//GEN-LAST:event_jButton1MouseClicked
 
     private void jTextField2ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jTextField2ActionPerformed
@@ -195,38 +240,79 @@ public class Simulacion extends javax.swing.JFrame {
     }//GEN-LAST:event_jButton2ActionPerformed
 
     private void jButton2MouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_jButton2MouseClicked
-         ArrayList<Proceso> procesos = new ArrayList<Proceso>();
+        
+         //Crear proceso
          Proceso proceso = new Proceso();
-         proceso.setId(Integer.parseInt(jTextField1.getText()));
+         proceso.setId((jTextField1.getText()));
          proceso.setNombre(jTextField2.getText());
+         //Calcular tiempo de llegada
+         long tiempo_llegada = (procesos.size()+1);
+         proceso.setTiempoLlegada(tiempo_llegada);
          proceso.setTiempoCPU(Integer.parseInt(jTextField3.getText()));
          
          System.out.println(proceso);
          
+         //Añadir proceso a la lista
          procesos.add(proceso);
          
-         
-         String[][] data = new String[procesos.size()][3];
+         //Crear modelo para la tabla
+         String[][] data = new String[procesos.size()][4];
          
          for(int i=0; i<procesos.size(); i++)
          {
              data[i][0] =  ""+procesos.get(i).getId();
              data[i][1] =  procesos.get(i).getNombre();
-             data[i][2] =  ""+procesos.get(i).getTiempoCPU();
+             data[i][2] =  ""+procesos.get(i).getTiempoLlegada();
+             data[i][3] =  ""+procesos.get(i).getTiempoCPU();
          }
          
-         
+         //agrega el model en la tabla
          jTable1.setModel(new javax.swing.table.DefaultTableModel(
             data,
             new String [] {
-                "Id", "Nombre", "Tiempo CPU"
+                "Id", "Nombre", "Tiempo LLegada", "Tiempo CPU"
             }
         ));
+         
+        //Mostrar tabla
         jScrollPane1.setViewportView(jTable1);
-         
-         
+            
     }//GEN-LAST:event_jButton2MouseClicked
 
+    private void jButton1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton1ActionPerformed
+  
+    }//GEN-LAST:event_jButton1ActionPerformed
+    public void mostrarDetalleFcfs(){
+        
+          System.out.println("Mostra detalle");
+         String[][] data = new String[procesos_execute_fscs.size()][4];
+         
+         for(int i=0; i<procesos_execute_fscs.size(); i++)
+         {
+             System.out.println(procesos_execute_fscs.get(i));
+             
+             data[i][0] =  ""+procesos_execute_fscs.get(i).getId();
+             data[i][1] =  procesos_execute_fscs.get(i).getNombre();
+             data[i][2] =  ""+procesos_execute_fscs.get(i).getTiempoEspera();
+             data[i][3] =  ""+procesos_execute_fscs.get(i).getTiempoCPU();
+             
+         }
+         
+         javax.swing.table.DefaultTableModel model = new DefaultTableModel();
+         jTable2.setModel(model);
+         model.fireTableDataChanged();
+         
+         model = new javax.swing.table.DefaultTableModel(
+            data,
+            new String [] {
+                "Id", "Nombre", "Tiempo Espera", "Tiempo CPU"
+            }
+        );
+         jTable2.setModel(model);
+         jTable2.repaint();
+         jTable2.setVisible(true);
+        jScrollPane2.setViewportView(jTable2);
+    }
     /**
      * @param args the command line arguments
      */
@@ -270,7 +356,10 @@ public class Simulacion extends javax.swing.JFrame {
     private javax.swing.JLabel jLabel3;
     private javax.swing.JLabel jLabel4;
     private javax.swing.JScrollPane jScrollPane1;
+    private javax.swing.JScrollPane jScrollPane2;
+    private javax.swing.JTabbedPane jTabbedPane1;
     private javax.swing.JTable jTable1;
+    private javax.swing.JTable jTable2;
     private javax.swing.JTextField jTextField1;
     private javax.swing.JTextField jTextField2;
     private javax.swing.JTextField jTextField3;
